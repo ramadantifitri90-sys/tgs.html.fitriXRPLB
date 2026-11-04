@@ -1,0 +1,284 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Arcade 🎮</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 25px 15px;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    color: white;
+    text-align: center;
+    background: linear-gradient(135deg, #180d2b, #54245f, #b65c91);
+}
+
+h1 {
+    color: #ffd9ef;
+    letter-spacing: 3px;
+    margin-top: 20px;
+}
+
+.subtitle {
+    color: #f5d8ee;
+    margin-bottom: 30px;
+}
+
+.container {
+    max-width: 500px;
+    margin: auto;
+}
+
+.card {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px;
+    padding: 22px 15px;
+    margin: 18px 0;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.card h2 {
+    color: #ffd9ef;
+}
+
+button {
+    border: none;
+    border-radius: 25px;
+    padding: 12px 22px;
+    margin: 7px;
+    background: #ffb9dc;
+    color: #54245f;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: white;
+}
+
+input {
+    padding: 12px;
+    width: 85%;
+    max-width: 280px;
+    border-radius: 15px;
+    border: none;
+    margin: 10px;
+    text-align: center;
+}
+
+.result {
+    color: #ffe1f2;
+    font-weight: bold;
+    min-height: 24px;
+}
+
+#gameArea {
+    margin-top: 15px;
+}
+
+#playground {
+    height: 220px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+    background: rgba(255,255,255,0.1);
+    margin-top: 15px;
+}
+
+.gift {
+    position: absolute;
+    font-size: 35px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.hidden {
+    display: none;
+}
+
+footer {
+    margin-top: 35px;
+    color: #f5d8ee;
+    font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🎮 BIRTHDAY ARCADE</h1>
+<p class="subtitle">Ready for a little fun? 💗</p>
+
+<!-- GAME 1 -->
+<div class="card">
+    <h2>💗 Guess the Answer</h2>
+    <p>Berapa hasil dari 5 + 7?</p>
+
+    <input id="answer" type="number" placeholder="Tulis jawabanmu">
+
+    <br>
+    <button onclick="checkAnswer()">Submit 💌</button>
+
+    <p id="answerResult" class="result"></p>
+</div>
+
+<!-- GAME 2 -->
+<div class="card">
+    <h2>🎁 Catch the Gifts</h2>
+    <p>Tangkap hadiah sebanyak mungkin dalam 15 detik!</p>
+
+    <p>Skor: <span id="score">0</span></p>
+    <p>Waktu: <span id="timer">15</span> detik</p>
+
+    <button onclick="startGame()">PLAY GAME 🎮</button>
+
+    <div id="playground" class="hidden"></div>
+    <p id="giftResult" class="result"></p>
+</div>
+
+<!-- GAME 3 -->
+<div class="card">
+    <h2>🔐 Unlock the Surprise</h2>
+    <p>Aku punya empat kaki, tetapi tidak bisa berjalan. Apakah aku?</p>
+
+    <input id="riddle" type="text" placeholder="Tebak jawabannya">
+
+    <br>
+    <button onclick="checkRiddle()">Unlock 🔑</button>
+
+    <p id="riddleResult" class="result"></p>
+
+    <div id="surprise" class="hidden">
+        <h2>🎉 YOU DID IT! 🎉</h2>
+        <p>Happy Birthday! 💗</p>
+        <p>Semoga hari-harimu dipenuhi kebahagiaan dan hal-hal indah. ✨</p>
+    </div>
+</div>
+
+<footer>
+    Made with 💗 just for you
+</footer>
+
+</div>
+
+<script>
+// GAME 1: TEBAK JAWABAN
+function checkAnswer() {
+    const answer = document.getElementById("answer").value;
+    const result = document.getElementById("answerResult");
+
+    if (answer === "") {
+        result.textContent = "Isi jawabannya dulu ya! 💗";
+    } else if (Number(answer) === 12) {
+        result.textContent = "YAY! Jawabanmu benar! 🎉";
+    } else {
+        result.textContent = "Belum tepat, coba lagi ya! 🌷";
+    }
+}
+
+// GAME 2: CATCH THE GIFTS
+let score = 0;
+let timeLeft = 15;
+let gameInterval;
+let timerInterval;
+let playing = false;
+
+function startGame() {
+    if (playing) return;
+
+    playing = true;
+    score = 0;
+    timeLeft = 15;
+
+    document.getElementById("score").textContent = score;
+    document.getElementById("timer").textContent = timeLeft;
+    document.getElementById("giftResult").textContent = "";
+
+    const area = document.getElementById("playground");
+    area.classList.remove("hidden");
+
+    gameInterval = setInterval(createGift, 650);
+
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+            endGame();
+        }
+    }, 1000);
+}
+
+function createGift() {
+    if (!playing) return;
+
+    const area = document.getElementById("playground");
+    const gift = document.createElement("span");
+
+    gift.className = "gift";
+    gift.textContent = ["🎁", "💝", "⭐", "💗"][
+        Math.floor(Math.random() * 4)
+    ];
+
+    gift.style.left =
+        Math.random() * Math.max(0, area.clientWidth - 40) + "px";
+
+    gift.style.top =
+        Math.random() * Math.max(0, area.clientHeight - 40) + "px";
+
+    gift.onclick = function() {
+        if (!playing) return;
+
+        score++;
+        document.getElementById("score").textContent = score;
+        gift.remove();
+    };
+
+    area.appendChild(gift);
+
+    setTimeout(() => gift.remove(), 1300);
+}
+
+function endGame() {
+    playing = false;
+    clearInterval(gameInterval);
+    clearInterval(timerInterval);
+
+    document.getElementById("playground").innerHTML = "";
+    document.getElementById("giftResult").textContent =
+        "Waktu habis! Kamu mendapat " + score + " poin! 🎉";
+}
+
+// GAME 3: TEKA-TEKI
+function checkRiddle() {
+    const answer = document.getElementById("riddle").value
+        .trim().toLowerCase();
+
+    const result = document.getElementById("riddleResult");
+
+    if (answer === "meja") {
+        result.textContent = "Kode berhasil dibuka! 🎉";
+
+        document.getElementById("surprise")
+            .classList.remove("hidden");
+    } else {
+        result.textContent = "Belum benar! Coba pikirkan lagi 💭";
+    }
+}
+</script>
+
+</body>
+</html>
+```
